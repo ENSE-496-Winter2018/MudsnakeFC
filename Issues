@@ -1,0 +1,2 @@
+ISSUE001:   Could not find a part of the path … bin\roslyn\csc.exe
+            Resolution: https://blogs.msdn.microsoft.com/jpsanders/2018/02/22/error-could-not-find-a-part-of-the-path-esitesroot0binroslyncsc-exe/
