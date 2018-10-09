@@ -15,7 +15,7 @@ namespace WebApplication.Controllers
         {
             if (Session["UserID"] != null)
             {
-                return View();//
+                return View();
             }
             else
             {
