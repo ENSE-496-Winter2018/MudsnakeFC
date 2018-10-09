@@ -51,6 +51,43 @@ namespace WebApplication.Controllers
                 return RedirectToAction("Login");
             }
         }
+
+        
+        public ActionResult Dashboard()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult NewIdea()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult NewIdea(Idea ideaParam)
+        {
+            ////Add code to handle form submission for newly created ideas
+            return View();
+        }
+
+        public ActionResult MyIdeas()
+        {
+            return View();
+        }
+
+        public ActionResult SubscribedIdeas()
+        {
+            return View();
+        }
+
+        public ActionResult SuccessStories()
+        {
+            return View();
+        }
+
+
+
     }
 }
     

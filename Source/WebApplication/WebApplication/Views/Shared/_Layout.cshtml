@@ -16,13 +16,16 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("eIDEAS", "Index", "User", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li>@Html.ActionLink("Home", "Index", "User")</li>
+                    <li>@Html.ActionLink("Dashboard", "Dashboard", "User")</li>
+                    <li>@Html.ActionLink("New Idea", "CreateIdea", "User")</li>
+                    <li>@Html.ActionLink("My Ideas", "MyIdeas", "User")</li>
+                    <li>@Html.ActionLink("Subscribed Ideas", "SubscribedIdeas", "User")</li>
+                    <li>@Html.ActionLink("Success Stories", "SuccessStories", "User")</li>
                 </ul>
                 @if (Session["UserID"] != null)
                 {
