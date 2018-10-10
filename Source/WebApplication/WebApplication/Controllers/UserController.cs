@@ -15,7 +15,16 @@ namespace WebApplication.Controllers
         {
             using (var context = new ENSE496Entities()) {
                 if (Session["UserID"] != null) {
-                    return View(context.Ideas.Where(x => true).ToList());
+
+                    var ideas = context.Ideas.Where(x => true).ToList();
+                    if(ideas.Count > 0)
+                    {
+                        foreach(Idea idea in ideas)
+                        {
+                            idea.User.Username.First();
+                        }
+                    }
+                    return View(ideas);
                 }
                 else {
                     return RedirectToAction("Login");
