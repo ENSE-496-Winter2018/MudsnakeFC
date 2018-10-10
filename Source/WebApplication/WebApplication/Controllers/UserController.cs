@@ -13,13 +13,13 @@ namespace WebApplication.Controllers
         // GET: User
         public ActionResult Index()
         {
-            if (Session["UserID"] != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login");
+            using (var context = new ENSE496Entities()) {
+                if (Session["UserID"] != null) {
+                    return View(context.Ideas.Where(x => true).ToList());
+                }
+                else {
+                    return RedirectToAction("Login");
+                }
             }
         }
 
