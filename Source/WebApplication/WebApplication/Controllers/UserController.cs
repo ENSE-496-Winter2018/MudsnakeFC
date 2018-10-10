@@ -59,16 +59,37 @@ namespace WebApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult NewIdea()
+        public ActionResult CreateIdea()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult NewIdea(Idea ideaParam)
+        public ActionResult CreateIdea(Idea ideaParam)
         {
-            ////Add code to handle form submission for newly created ideas
-            return View();
+            using (var context = new ENSE496Entities()) {
+                if (Session["UserID"] != null) {
+                    if ((String.IsNullOrEmpty(ideaParam.Title)) || (String.IsNullOrEmpty(ideaParam.Description))) {
+                        TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "You have left either the title or description empty" };
+                        return RedirectToAction("CreateIdea");
+                    }
+                    else if (ideaParam.Title.Length > 255) {
+                        TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "The title must be less than 256 characters" };
+                        return RedirectToAction("CreateIdea");
+                    }
+                    else {
+                        Idea newIdea = new Idea();
+                        newIdea.Title = ideaParam.Title;
+                        newIdea.Description = ideaParam.Title;
+                        newIdea.User_id = Convert.ToInt32(Session["UserID"]);
+                        newIdea.Status = "Pending";
+                        context.Ideas.Add(newIdea);
+                        context.SaveChanges();
+                        return RedirectToAction("Index");
+                    }
+                }
+                return View();
+            }
         }
 
         public ActionResult MyIdeas()
