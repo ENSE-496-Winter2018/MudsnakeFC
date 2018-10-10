@@ -4,7 +4,7 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h2>Home</h2>
 
 
 @if (Model != null)
@@ -18,11 +18,12 @@
             @Html.DisplayNameFor(model => model.Title)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Status)
+            Submitted By
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.User.Username)
+            @Html.DisplayNameFor(model => model.Status)
         </th>
+        <th></th>
         <th></th>
     </tr>
  
@@ -36,10 +37,26 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Status)
+                @* insert code here for displaying username *@
             </td>
             <td>
-                @*@Html.DisplayFor(modelItem => item.User.Username)*@
+                    @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                <li class="dropdown" style="list-style: none">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Change Status</button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a href="@Url.Action("Park", new { id = item.Id })">Park</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Park", new { id = item.Id })">Decline</a>
+                        </li>
+                        <li class="hz">
+                            <a href="@Url.Action("Park", new { id = item.Id })">Plan</a>
+                        </li>
+                    </ul>
+                </li>
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
@@ -53,5 +70,6 @@
     }
 
 </table>
+
 
 }
