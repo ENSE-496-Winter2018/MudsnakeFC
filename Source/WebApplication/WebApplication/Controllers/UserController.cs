@@ -107,8 +107,13 @@ namespace WebApplication.Controllers
             return View();
         }
 
-
-
+        public ActionResult DeleteIdea(int id) {
+            using (var context = new ENSE496Entities()) {
+                context.Ideas.Remove(context.Ideas.Where(x => x.Id == id).FirstOrDefault());
+                context.SaveChanges();
+                return RedirectToAction("Index");
+            }               
+        }
     }
 }
     

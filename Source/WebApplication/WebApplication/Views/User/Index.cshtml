@@ -46,7 +46,7 @@
                 @Html.ActionLink("Status", "Status", new { id = item.Id }) 
                 @if (item.User_id == Convert.ToInt32(Session["UserID"])) {
                     @:|
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    @Html.ActionLink("Delete", "DeleteIdea", new { id = item.Id })
                 }
             </td>
         </tr>
