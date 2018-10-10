@@ -61,7 +61,14 @@ namespace WebApplication.Controllers
             }
         }
 
-        
+        public ActionResult Logout()
+        {
+            Session.Abandon();
+            return RedirectToAction("Login");
+        }
+
+
+
         public ActionResult Dashboard()
         {
             return View();
