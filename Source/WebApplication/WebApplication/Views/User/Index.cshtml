@@ -75,9 +75,6 @@
                             <li>
                                 <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
                             </li>
-                            <li>
-                                <a href="@Url.Action("PlanIdea", new { id = item.Id })">Plan</a>
-                            </li>
                         }
 
                         @if (item.Status == "Declined")
@@ -86,8 +83,10 @@
                                 <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
                             </li>
                         }
-                        @if (item.Status == "Plan")
-                        {
+                        @if (item.Status == "Planned") {
+                            <li>
+                                <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                            </li>
                             <li>
                                 <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
                             </li>

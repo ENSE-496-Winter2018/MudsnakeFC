@@ -255,6 +255,7 @@
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\User\CreateIdea.cshtml" />
     <Content Include="Views\User\MyIdeas.cshtml" />
+    <Content Include="Views\User\EditIdea.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

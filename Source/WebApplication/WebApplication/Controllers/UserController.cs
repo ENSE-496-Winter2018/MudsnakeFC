@@ -147,8 +147,46 @@ namespace WebApplication.Controllers
             using (var context = new ENSE496Entities()) {
                 context.Ideas.Remove(context.Ideas.Where(x => x.Id == id).FirstOrDefault());
                 context.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("MyIdeas");
             }               
+        }
+
+        public ActionResult ParkIdea(int id) {
+            using (var context = new ENSE496Entities()) {
+                context.Ideas.Where(x => x.Id == id).FirstOrDefault().Status = "Parked";
+                context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult PlanIdea(int id) {
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult EditIdea() {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult EditIdea(Idea ideaParam) {
+            using (var context = new ENSE496Entities()) {
+            /****Need the Id to change the correct record in the db*/ 
+                //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Status = "Pending";
+                //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Title = ideaParam.Title;
+                //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Description  = ideaParam.Description;
+            //****
+                context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+        }
+
+        public ActionResult DeclineIdea(int id) {
+            using (var context = new ENSE496Entities()) {
+                context.Ideas.Where(x => x.Id == id).FirstOrDefault().Status = "Declined";
+                context.SaveChanges();
+                return RedirectToAction("Index");
+            }
         }
     }
 }
