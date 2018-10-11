@@ -52,6 +52,7 @@ namespace WebApplication.Controllers
                         {
                             Session["UserID"] = user.Id.ToString();
                             Session["Username"] = user.Username.ToString();
+                            Session["UserType"] = user.Type.ToString();
                             return RedirectToAction("Index");
                         }
                     }
@@ -110,7 +111,26 @@ namespace WebApplication.Controllers
 
         public ActionResult MyIdeas()
         {
-            return View();
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    int UserID = Convert.ToInt32(Session["UserID"]);
+                    var ideas = context.Ideas.Where(x => x.User_id == UserID).ToList();
+                    if (ideas.Count > 0)
+                    {
+                        foreach (Idea idea in ideas)
+                        {
+                            idea.User.Username.First();
+                        }
+                    }
+                    return View(ideas);
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
+            }
         }
 
         public ActionResult SubscribedIdeas()
