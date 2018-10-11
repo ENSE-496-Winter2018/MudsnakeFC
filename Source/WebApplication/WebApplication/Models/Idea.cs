@@ -18,6 +18,7 @@ namespace WebApplication.Models
         public Idea()
         {
             this.Feedbacks = new HashSet<Feedback>();
+            this.Status_log = new HashSet<Status_log>();
         }
     
         public int Id { get; set; }
@@ -29,5 +30,7 @@ namespace WebApplication.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual User User { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Status_log> Status_log { get; set; }
     }
 }

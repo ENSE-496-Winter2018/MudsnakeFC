@@ -15,6 +15,9 @@
         <AssociationConnector Association="ENSE496Model.FK_Idea_User" ManuallyRouted="false" />
         <AssociationConnector Association="ENSE496Model.FK_NotificationReceiver_User" ManuallyRouted="false" />
         <AssociationConnector Association="ENSE496Model.FK_NotificationSender_User" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="ENSE496Model.Status_log" Width="1.5" PointX="5.25" PointY="7.875" />
+        <AssociationConnector Association="ENSE496Model.FK_Status_log_Idea" />
+        <AssociationConnector Association="ENSE496Model.FK_Status_log_User" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

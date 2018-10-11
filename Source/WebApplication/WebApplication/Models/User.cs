@@ -21,6 +21,7 @@ namespace WebApplication.Models
             this.Ideas = new HashSet<Idea>();
             this.Notifications = new HashSet<Notification>();
             this.Notifications1 = new HashSet<Notification>();
+            this.Status_log = new HashSet<Status_log>();
         }
     
         public int Id { get; set; }
@@ -39,5 +40,7 @@ namespace WebApplication.Models
         public virtual ICollection<Notification> Notifications { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Notification> Notifications1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Status_log> Status_log { get; set; }
     }
 }
