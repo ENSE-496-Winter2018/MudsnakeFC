@@ -151,13 +151,45 @@ namespace WebApplication.Controllers
             }               
         }
 
-        public ActionResult ParkIdea(int id) {
-            using (var context = new ENSE496Entities()) {
-                context.Ideas.Where(x => x.Id == id).FirstOrDefault().Status = "Parked";
+        [HttpGet]
+        public ActionResult ParkIdea(int id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                Idea idea = context.Ideas.Where(x => x.Id == id).FirstOrDefault();
+                Status_log statusLog = new Status_log();
+                statusLog.Idea_id = id;
+                return View(statusLog);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ParkIdea(Status_log statusLogParam)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
+                Status_log statusLog = new Status_log();
+                statusLog.Current_status = "Parked";
+                statusLog.Previous_status = idea.Status;
+                statusLog.Idea_id = statusLogParam.Idea_id;
+                statusLog.User_id = Convert.ToInt32(Session["UserID"]);
+                statusLog.Description = statusLogParam.Description;
+                context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Parked";
+                context.Status_log.Add(statusLog);
                 context.SaveChanges();
                 return RedirectToAction("Index");
             }
         }
+
+        //zains code
+        //public ActionResult ParkIdea(int id) {
+        //    using (var context = new ENSE496Entities()) {
+        //        context.Ideas.Where(x => x.Id == id).FirstOrDefault().Status = "Parked";
+        //        context.SaveChanges();
+        //        return RedirectToAction("Index");
+        //    }
+        //}
 
         public ActionResult PlanIdea(int id) {
             return View();
@@ -181,9 +213,41 @@ namespace WebApplication.Controllers
             }
         }
 
-        public ActionResult DeclineIdea(int id) {
-            using (var context = new ENSE496Entities()) {
-                context.Ideas.Where(x => x.Id == id).FirstOrDefault().Status = "Declined";
+        // zains code
+        //public ActionResult DeclineIdea(int id) {
+        //    using (var context = new ENSE496Entities()) {
+        //        context.Ideas.Where(x => x.Id == id).FirstOrDefault().Status = "Declined";
+        //        context.SaveChanges();
+        //        return RedirectToAction("Index");
+        //    }
+        //}
+
+        [HttpGet]
+        public ActionResult DeclineIdea(int id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                Idea idea = context.Ideas.Where(x => x.Id == id).FirstOrDefault();
+                Status_log statusLog = new Status_log();
+                statusLog.Idea_id = id;
+                return View(statusLog);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult DeclineIdea(Status_log statusLogParam)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
+                Status_log statusLog = new Status_log();
+                statusLog.Current_status = "Declined";
+                statusLog.Previous_status = idea.Status;
+                statusLog.Idea_id = statusLogParam.Idea_id;
+                statusLog.User_id = Convert.ToInt32(Session["UserID"]);
+                statusLog.Description = statusLogParam.Description;
+                context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Declined";
+                context.Status_log.Add(statusLog);
                 context.SaveChanges();
                 return RedirectToAction("Index");
             }

@@ -256,6 +256,8 @@
     <Content Include="Views\User\CreateIdea.cshtml" />
     <Content Include="Views\User\MyIdeas.cshtml" />
     <Content Include="Views\User\EditIdea.cshtml" />
+    <Content Include="Views\User\ParkIdea.cshtml" />
+    <Content Include="Views\User\DeclineIdea.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
