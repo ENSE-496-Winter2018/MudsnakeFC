@@ -12,12 +12,16 @@ namespace WebApplication.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class sysdiagram
+    public partial class Comment
     {
-        public string name { get; set; }
-        public int principal_id { get; set; }
-        public int diagram_id { get; set; }
-        public Nullable<int> version { get; set; }
-        public byte[] definition { get; set; }
+        public int Id { get; set; }
+        public int Idea_id { get; set; }
+        public int User_id { get; set; }
+        public string Comment1 { get; set; }
+        public int Timestamp { get; set; }
+        public Nullable<bool> Active { get; set; }
+    
+        public virtual Idea Idea { get; set; }
+        public virtual User User { get; set; }
     }
 }

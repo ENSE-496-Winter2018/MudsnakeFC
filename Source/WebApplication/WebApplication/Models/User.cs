@@ -22,6 +22,10 @@ namespace WebApplication.Models
             this.Notifications = new HashSet<Notification>();
             this.Notifications1 = new HashSet<Notification>();
             this.Status_log = new HashSet<Status_log>();
+            this.Comments = new HashSet<Comment>();
+            this.Likes = new HashSet<Like>();
+            this.Subscriptions = new HashSet<Subscription>();
+            this.Teams = new HashSet<Team>();
         }
     
         public int Id { get; set; }
@@ -31,6 +35,8 @@ namespace WebApplication.Models
         public Nullable<int> Photo_num { get; set; }
         public byte[] Photo_DIR { get; set; }
         public string Type { get; set; }
+        public Nullable<bool> Active { get; set; }
+        public Nullable<int> Team_id { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Feedback> Feedbacks { get; set; }
@@ -42,5 +48,16 @@ namespace WebApplication.Models
         public virtual ICollection<Notification> Notifications1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Status_log> Status_log { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Comment> Comments { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Like> Likes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Subscription> Subscriptions { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Team> Teams { get; set; }
+        public virtual Team Team { get; set; }
+        public virtual User User1 { get; set; }
+        public virtual User User2 { get; set; }
     }
 }

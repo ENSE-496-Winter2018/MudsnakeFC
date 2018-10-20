@@ -19,6 +19,7 @@ namespace WebApplication.Models
         public int Receiver_id { get; set; }
         public string Message { get; set; }
         public bool Is_seen { get; set; }
+        public Nullable<bool> Active { get; set; }
     
         public virtual User User { get; set; }
         public virtual User User1 { get; set; }

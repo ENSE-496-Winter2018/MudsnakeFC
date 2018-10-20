@@ -12,12 +12,11 @@ namespace WebApplication.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Feedback
+    public partial class Like
     {
         public int Id { get; set; }
         public int Idea_id { get; set; }
         public int User_id { get; set; }
-        public string Text { get; set; }
         public Nullable<bool> Active { get; set; }
     
         public virtual Idea Idea { get; set; }

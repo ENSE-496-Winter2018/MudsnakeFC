@@ -20,6 +20,7 @@ namespace WebApplication.Models
         public string Description { get; set; }
         public int Idea_id { get; set; }
         public Nullable<int> User_id { get; set; }
+        public Nullable<bool> Active { get; set; }
     
         public virtual Idea Idea { get; set; }
         public virtual User User { get; set; }

@@ -30,9 +30,12 @@ namespace WebApplication.Models
         public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<Idea> Ideas { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Status_log> Status_log { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<Like> Likes { get; set; }
+        public virtual DbSet<Subscription> Subscriptions { get; set; }
+        public virtual DbSet<Team> Teams { get; set; }
     
         public virtual int sp_alterdiagram(string diagramname, Nullable<int> owner_id, Nullable<int> version, byte[] definition)
         {
