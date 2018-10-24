@@ -43,6 +43,14 @@
             <td>
                     @Html.DisplayFor(modelItem => item.Status)
             </td>
+
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+
+
+
             @if (item.User_id == Convert.ToInt32(Session["UserID"]))
             {
             <td>
@@ -94,8 +102,13 @@
                     </ul>
                 </li>
             </td>
+      
             }
             else { <td></td>}
+
+            <td>
+                <a href="@Url.Action("Subscribe",new {idea_id=item.Id, user_id = item.User_id})">Subscribe</a>
+            </td>
         </tr>
     }
 

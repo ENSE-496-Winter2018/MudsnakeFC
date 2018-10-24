@@ -1,0 +1,48 @@
+﻿@model IEnumerable<WebApplication.ViewModels.SubscriptionViewModel>
+
+
+
+    @{
+        ViewBag.Title = "Subscribed Idea";
+    }
+
+    <h2>Subscribed Idea</h2>   
+
+    <table class="table">
+        <tr>
+            <th>
+
+                @Html.DisplayNameFor(model => model.idea.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.idea.Title)
+            </th>
+
+            <th>Author</th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a href="@Url.Action("ViewIdea", new {Id = item.subscription.Idea_id}))">@Html.DisplayFor(modelItem => item.subscription.Idea_id)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.idea.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.idea.User.Username)
+                </td>
+
+                <td>
+                    <a href="@Url.Action("Unsubscribe",new {idea_id=item.idea.Id, user_id = item.subscription.User_id})">Unsubscribe</a>
+                </td>
+
+
+            </tr>
+        }
+
+    </table>
+
+

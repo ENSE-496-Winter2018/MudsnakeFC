@@ -13,13 +13,15 @@ namespace WebApplication.Controllers
         // GET: User
         public ActionResult Index()
         {
-            using (var context = new ENSE496Entities()) {
-                if (Session["UserID"] != null) {
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
 
                     var ideas = context.Ideas.Where(x => true).ToList();
-                    if(ideas.Count > 0)
+                    if (ideas.Count > 0)
                     {
-                        foreach(Idea idea in ideas)
+                        foreach (Idea idea in ideas)
                         {
                             idea.User.Username.First();
                         }
@@ -84,13 +86,17 @@ namespace WebApplication.Controllers
         [HttpPost]
         public ActionResult CreateIdea(Idea ideaParam)
         {
-            using (var context = new ENSE496Entities()) {
-                if (Session["UserID"] != null) {
-                    if ((String.IsNullOrEmpty(ideaParam.Title)) || (String.IsNullOrEmpty(ideaParam.Description))) {
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    if ((String.IsNullOrEmpty(ideaParam.Title)) || (String.IsNullOrEmpty(ideaParam.Description)))
+                    {
                         TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "You have left either the title or description empty" };
                         return RedirectToAction("CreateIdea");
                     }
-                    else if (ideaParam.Title.Length > 255) {
+                    else if (ideaParam.Title.Length > 255)
+                    {
                         TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "The title must be less than 256 characters" };
                         return RedirectToAction("CreateIdea");
                     }
@@ -132,24 +138,62 @@ namespace WebApplication.Controllers
                 }
             }
         }
+        //*****************
 
         public ActionResult SubscribedIdeas()
         {
-            return View();
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    int UserID = Convert.ToInt32(Session["UserID"]);
+
+                    var subViewModel = new List<SubscriptionViewModel>();
+
+                    var subscribe = context.Subscriptions.Where(x => x.User_id == UserID).ToList();
+                    var relatedIdea = context.Ideas.ToList();
+
+                    if (subscribe.Count > 0)
+                    {
+                        for (int i = 0; i < subscribe.Count; i++)
+                        {
+                            subscribe[i].User.Username.First();
+
+                            for (int j = 0; j < relatedIdea.Count; j++)
+                            {
+                                if (subscribe[i].Idea_id == relatedIdea[j].Id)
+                                {
+                                    subViewModel.Add(new SubscriptionViewModel { idea = relatedIdea[j], subscription = subscribe[i] });
+                                }
+                            }
+                        }
+                    }
+
+                    return View(subViewModel);
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
+            }
         }
 
+
+        //*****************
         public ActionResult SuccessStories()
         {
             return View();
         }
 
-        public ActionResult DeleteIdea(int id) {
-            using (var context = new ENSE496Entities()) {
+        public ActionResult DeleteIdea(int id)
+        {
+            using (var context = new ENSE496Entities())
+            {
                 context.Ideas.Remove(context.Ideas.Where(x => x.Id == id).FirstOrDefault());
                 context.Status_log.Remove(context.Status_log.Where(x => x.Idea_id == id).FirstOrDefault());
                 context.SaveChanges();
                 return RedirectToAction("MyIdeas");
-            }               
+            }
         }
 
         [HttpGet]
@@ -192,23 +236,27 @@ namespace WebApplication.Controllers
         //    }
         //}
 
-        public ActionResult PlanIdea(int id) {
+        public ActionResult PlanIdea(int id)
+        {
             return View();
         }
 
         [HttpGet]
-        public ActionResult EditIdea() {
+        public ActionResult EditIdea()
+        {
             return View();
         }
 
         [HttpPost]
-        public ActionResult EditIdea(Idea ideaParam) {
-            using (var context = new ENSE496Entities()) {
-            /****Need the Id to change the correct record in the db*/ 
+        public ActionResult EditIdea(Idea ideaParam)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                /****Need the Id to change the correct record in the db*/
                 //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Status = "Pending";
                 //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Title = ideaParam.Title;
                 //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Description  = ideaParam.Description;
-            //****
+                //****
                 context.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -253,6 +301,60 @@ namespace WebApplication.Controllers
                 return RedirectToAction("Index");
             }
         }
+        //****************************************subscribe
+
+        public ActionResult Subscribe(int idea_id, int user_id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                int UserID = Convert.ToInt32(Session["UserID"]);
+                var sub = context.Subscriptions.Where(x => x.User_id == UserID).ToList();
+
+                if (sub.Count > 0)
+                {
+                    foreach (Subscription s in sub)
+                    {
+                        if (s.Idea_id == idea_id && s.User_id == user_id)
+                        {
+                            return RedirectToAction("Index");
+                        }
+                    }
+                }
+                Subscription subscribe = new Subscription();
+                subscribe.Idea_id = idea_id;
+                subscribe.User_id = user_id;
+                subscribe.Active = true;
+
+                context.Subscriptions.Add(subscribe);
+                context.SaveChanges();
+                return RedirectToAction("SubscribedIdeas");
+            }
+        }
+
+        public ActionResult Unsubscribe(int idea_id, int user_id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                int UserID = Convert.ToInt32(Session["UserID"]);
+                var sub = context.Subscriptions.Where(x => x.User_id == UserID).ToList();
+
+                if (sub.Count > 0)
+                {
+                    foreach (Subscription s in sub)
+                    {
+                        if (s.Idea_id == idea_id && s.User_id == user_id)
+                        {
+                            context.Subscriptions.Remove(s);
+                            context.SaveChanges();
+                            return RedirectToAction("SubscribedIdeas");
+                        }
+                    }
+                }
+                return RedirectToAction("SubscribedIdeas");
+            }
+        }
+
+
     }
 }
     
