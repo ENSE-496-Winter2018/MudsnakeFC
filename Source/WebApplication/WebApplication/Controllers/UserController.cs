@@ -97,7 +97,7 @@ namespace WebApplication.Controllers
                     else {
                         Idea newIdea = new Idea();
                         newIdea.Title = ideaParam.Title;
-                        newIdea.Description = ideaParam.Title;
+                        newIdea.Description = ideaParam.Description;
                         newIdea.User_id = Convert.ToInt32(Session["UserID"]);
                         newIdea.Status = "Pending";
                         context.Ideas.Add(newIdea);
