@@ -22,6 +22,11 @@ namespace WebApplication.Controllers
                         foreach(Idea idea in ideas)
                         {
                             idea.User.Username.First();
+                            if (idea.User.Team_id.HasValue)
+                                idea.User.Team_id.GetValueOrDefault();
+                            else
+                                idea.User.Team_id = 0;
+                            idea.Subscriptions.Where(x => x.User_id == Convert.ToInt32(Session["UserID"])).FirstOrDefault();
                         }
                     }
                     return View(ideas);
@@ -53,6 +58,10 @@ namespace WebApplication.Controllers
                             Session["UserID"] = user.Id.ToString();
                             Session["Username"] = user.Username.ToString();
                             Session["UserType"] = user.Type.ToString();
+                            if (user.Team_id.HasValue)
+                                Session["TeamID"] = user.Team_id.Value;
+                            else
+                                Session["TeamID"] = 0;
                             return RedirectToAction("Index");
                         }
                     }
@@ -133,11 +142,6 @@ namespace WebApplication.Controllers
             }
         }
 
-        public ActionResult SubscribedIdeas()
-        {
-            return View();
-        }
-
         public ActionResult SuccessStories()
         {
             return View();
@@ -197,18 +201,18 @@ namespace WebApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult EditIdea() {
-            return View();
+        public ActionResult EditIdea(int id) {
+            using (var context = new ENSE496Entities())
+            {
+                return View(context.Ideas.Where(x => x.Id == id).First());
+            }
         }
 
         [HttpPost]
         public ActionResult EditIdea(Idea ideaParam) {
             using (var context = new ENSE496Entities()) {
-            /****Need the Id to change the correct record in the db*/ 
-                //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Status = "Pending";
-                //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Title = ideaParam.Title;
-                //context.Ideas.Where(x => x.Id == ideaParam.Id).FirstOrDefault().Description  = ideaParam.Description;
-            //****
+                context.Ideas.Where(x => x.Id == ideaParam.Id).First().Title = ideaParam.Title;
+                context.Ideas.Where(x => x.Id == ideaParam.Id).First().Description = ideaParam.Description;
                 context.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -253,6 +257,262 @@ namespace WebApplication.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+        [HttpGet]
+        public ActionResult ViewIdea(int id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                var ideaViewModel = new IdeaViewModel();
+                ideaViewModel.Idea = context.Ideas.Where(x => x.Id == id).FirstOrDefault();
+                ideaViewModel.Comments = context.Comments.Where(x => x.Idea_id == id && x.Active == true).ToList();
+                if(ideaViewModel.Comments.Count > 0)
+                {
+                    foreach(Comment comment in ideaViewModel.Comments)
+                    {
+                        comment.User.Username.First();
+                    }
+                }
+                ideaViewModel.Likes = context.Likes.Where(x => x.Idea_id == id && x.Active == true).ToList();
+                return View(ideaViewModel);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CreateComment(Comment commentParam)
+        {
+
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    //if (String.IsNullOrEmpty(commentParam.Comment1))
+                    //{
+                    //    TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "You have left the comment empty" };
+                    //    return RedirectToAction("CreateIdea");
+                    //}
+                    //else
+                    //{
+                        Comment newComment = new Comment();
+                        newComment.Idea_id = commentParam.Idea_id;
+                        newComment.Comment1 = commentParam.Comment1;
+                        newComment.User_id  = Convert.ToInt32(Session["UserID"]);
+                        newComment.Submitted_on = DateTime.Now;
+                        newComment.Active = true;
+                        context.Comments.Add(newComment);
+                        context.SaveChanges();
+                        return RedirectToAction("ViewIdea", new { id = commentParam.Idea_id });
+                    //}
+                }
+                return View();
+            }
+        }
+
+        public ActionResult LikeIdea(int idea_id)
+        {
+
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    int userId = Convert.ToInt32(Session["UserID"]);
+                    if (context.Likes.Where(x => x.User_id == userId && x.Idea_id == idea_id).Any()) //checks if user has any inactive likes already stored in DB
+                    {
+                        context.Likes.Where(x => x.User_id == userId && x.Idea_id == idea_id).First().Active = true;
+                    }
+                    else
+                    {
+                        Like newLike = new Like();
+                        newLike.Idea_id = idea_id;
+                        newLike.User_id = userId;
+                        newLike.Active = true;
+                        context.Likes.Add(newLike);
+                    }
+                    context.SaveChanges();
+                    return RedirectToAction("ViewIdea", new { id = idea_id });
+                }
+                return View();
+            }
+        }
+
+
+        public ActionResult UnlikeIdea(int idea_id)
+        {
+
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    int userId = Convert.ToInt32(Session["UserID"]);
+                    //if (context.Likes.Where(x => x.User_id == Convert.ToInt32(Session["UserID"])).Any()) //checks if user has any inactive likes already stored in DB
+                    //{
+                    context.Likes.Where(x => x.User_id == userId && x.Idea_id == idea_id).First().Active = false;
+                    context.SaveChanges();
+                    //}
+                    return RedirectToAction("ViewIdea", new { id = idea_id });
+                }
+                return View();
+            }
+        }
+
+
+        public ActionResult PendingIdeas()
+        {
+            using (var context = new ENSE496Entities())
+            {
+                string type = Session["UserType"].ToString();
+                if ((Session["UserID"] != null))
+                {
+                    int userId = Convert.ToInt32(Session["UserID"]);
+                    int myTeamId;
+                    if (context.Users.Where(x => x.Id == userId).First().Team_id.HasValue)
+                    {
+                        myTeamId = context.Users.Where(x => x.Id == userId).First().Team_id.Value;
+                    }
+                    else
+                        myTeamId = 0; //if user does not have team id assigned
+                    if(type == "superapprover")
+                    {
+                        var ideas = context.Ideas.Where(x => x.Status == "Pending" ).ToList();
+                        if (ideas.Count > 0)
+                        {
+                            foreach (Idea idea in ideas)
+                            {
+                                idea.User.Username.First();
+                            }
+                        }
+                        return View(ideas);
+                    }
+                    else if(type == "approver")
+                    {
+                        var ideas = context.Ideas.Where(x => x.Status == "Pending" && x.User.Team.Id == myTeamId).ToList();
+                        if (ideas.Count > 0)
+                        {
+                            foreach (Idea idea in ideas)
+                            {
+                                idea.User.Username.First();
+                            }
+                        }
+                        return View(ideas);
+                    }
+                    else
+                        RedirectToAction("Index");
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
+            }
+            return RedirectToAction("Login");
+        }
+
+
+        [HttpGet]
+        public ActionResult ApproveIdea(int id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                Idea idea = context.Ideas.Where(x => x.Id == id).FirstOrDefault();
+                Status_log statusLog = new Status_log();
+                statusLog.Idea_id = id;
+                return View(statusLog);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ApproveIdea(Status_log statusLogParam)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
+                Status_log statusLog = new Status_log();
+                statusLog.Current_status = "Approved";
+                statusLog.Previous_status = idea.Status;
+                statusLog.Idea_id = statusLogParam.Idea_id;
+                statusLog.User_id = Convert.ToInt32(Session["UserID"]);
+                statusLog.Description = statusLogParam.Description;
+                context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Approved";
+                context.Status_log.Add(statusLog);
+                context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+        }
+
+
+        public ActionResult Subscribe(int idea_id)
+        {
+
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    int userId = Convert.ToInt32(Session["UserID"]);
+                    if (context.Subscriptions.Where(x => x.User_id == userId && x.Idea_id == idea_id).Any()) //checks if user has any inactive likes already stored in DB
+                    {
+                        context.Subscriptions.Where(x => x.User_id == userId && x.Idea_id == idea_id).First().Active = true;
+                    }
+                    else
+                    {
+                        Subscription subscription = new Subscription();
+                        subscription.Idea_id = idea_id;
+                        subscription.User_id = userId;
+                        subscription.Active = true;
+                        context.Subscriptions.Add(subscription);
+                    }
+                    context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                return View();
+            }
+        }
+
+        public ActionResult Unsubscribe(int idea_id)
+        {
+
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    int userId = Convert.ToInt32(Session["UserID"]);
+                    context.Subscriptions.Where(x => x.User_id == userId && x.Idea_id == idea_id).First().Active = false;
+                    context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                return View();
+            }
+        }
+
+        public ActionResult SubscribedIdeas()
+        {
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+
+                    var ideas = context.Ideas.Where(x => true).ToList();
+                    if (ideas.Count > 0)
+                    {
+                        foreach (Idea idea in ideas)
+                        {
+                            idea.User.Username.First();
+                            if (idea.User.Team_id.HasValue)
+                                idea.User.Team_id.GetValueOrDefault();
+                            else
+                                idea.User.Team_id = 0;
+                            idea.Subscriptions.Where(x => x.User_id == Convert.ToInt32(Session["UserID"])).FirstOrDefault();
+                        }
+                    }
+                    return View(ideas);
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
+            }
+        }
+
+
+
     }
 }
     

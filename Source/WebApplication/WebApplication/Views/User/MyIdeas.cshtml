@@ -26,7 +26,7 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            <a href="@Url.Action("ViewIdea", new {Id = item.Id}))">@Html.DisplayFor(modelItem => item.Id)</a>
+            <a href="@Url.Action("ViewIdea", new {Id = item.Id})">@Html.DisplayFor(modelItem => item.Id)</a>
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Title)
@@ -78,12 +78,26 @@
                             <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
                         </li>
                     }
-                    @if (item.Status == "Plan")
+                    @if (item.Status == "Planned")
                     {
+                        <li>
+                                <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                            </li>
                         <li>
                             <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
                         </li>
-                    }         
+                    }
+                    @if (item.Status == "Approved") {
+                            <li>
+                                <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                            </li>
+                             <li>
+                                <a href="@Url.Action("PlanIdea", new { id = item.Id })">Plan</a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                            </li>
+                        }       
                 </ul>
             </li>
         </td>

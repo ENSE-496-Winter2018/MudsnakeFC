@@ -1,0 +1,151 @@
+﻿@model IEnumerable<WebApplication.Models.Idea>
+
+@{
+    ViewBag.Title = "Subscribed Ideas";
+}
+
+<h2>Subscribed Ideas</h2>
+
+
+@if (Model != null)
+{
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            Submitted By
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        if (item.Subscriptions.Any())
+        {
+            if (item.Subscriptions.First().Active.Value == true)
+            {
+
+
+            <tr>
+                <td>
+                    <a href="@Url.Action("ViewIdea", new { Id = item.Id })">@Html.DisplayFor(modelItem => item.Id)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Username)
+                    @* insert code here for displaying username *@
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                @if (item.User_id == Convert.ToInt32(Session["UserID"]) || (Session["TeamID"].Equals(item.User.Team_id.Value) && Session["UserType"].ToString() == "approver") || Session["UserType"].ToString() == "superapprover")
+                {
+                    <td>
+                        <li class="dropdown" style="list-style: none">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>
+                            <ul class="dropdown-menu" role="menu">
+                                @if (item.Status == "Pending")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("EditIdea", new { id = item.Id })">Edit</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeclineIdea", new { id = item.Id })">Decline</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+                                @if (item.Status == "Parked")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("EditIdea", new { id = item.Id })">Edit</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeclineIdea", new { id = item.Id })">Decline</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+
+                                @if (item.Status == "Declined")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+                                @if (item.Status == "Planned")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+                                @if (item.Status == "Approved")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("PlanIdea", new { id = item.Id })">Plan</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    </td>
+                }
+                else
+                {
+                    <td></td>}
+                @if (item.Subscriptions.Any())
+                {
+                    if (item.Subscriptions.First().Active.Value == true)
+                    {
+                        <td>
+                            <a href="@Url.Action("Unsubscribe", new { idea_id = item.Id })">Unsubscribe</a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <a href="@Url.Action("Subscribe", new { idea_id = item.Id })">Subscribe</a>
+                        </td>
+                    }
+                }
+                else
+                {
+                    <td>
+                        <a href="@Url.Action("Subscribe", new { idea_id = item.Id })">Subscribe</a>
+                    </td>
+                }
+            </tr>
+                }
+            }
+        }
+
+    </table>
+
+
+}
+
+

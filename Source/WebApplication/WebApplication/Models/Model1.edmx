@@ -13,8 +13,8 @@
           <Property Name="Idea_id" Type="int" Nullable="false" />
           <Property Name="User_id" Type="int" Nullable="false" />
           <Property Name="Comment" Type="varchar(max)" Nullable="false" />
-          <Property Name="Timestamp" Type="int" Nullable="false" />
           <Property Name="Active" Type="bit" />
+          <Property Name="Submitted_on" Type="datetime" />
         </EntityType>
         <EntityType Name="Feedback">
           <Key>
@@ -662,10 +662,10 @@
           <Property Name="Idea_id" Type="Int32" Nullable="false" />
           <Property Name="User_id" Type="Int32" Nullable="false" />
           <Property Name="Comment1" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Timestamp" Type="Int32" Nullable="false" />
           <Property Name="Active" Type="Boolean" />
           <NavigationProperty Name="Idea" Relationship="ENSE496Model.FK_Comment_Idea" FromRole="Comment" ToRole="Idea" />
           <NavigationProperty Name="User" Relationship="ENSE496Model.FK_Comment_User" FromRole="Comment" ToRole="User" />
+          <Property Name="Submitted_on" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Like">
           <Key>
@@ -880,8 +880,8 @@
           <EntitySetMapping Name="Comments">
             <EntityTypeMapping TypeName="ENSE496Model.Comment">
               <MappingFragment StoreEntitySet="Comment">
+                <ScalarProperty Name="Submitted_on" ColumnName="Submitted_on" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
                 <ScalarProperty Name="Comment1" ColumnName="Comment" />
                 <ScalarProperty Name="User_id" ColumnName="User_id" />
                 <ScalarProperty Name="Idea_id" ColumnName="Idea_id" />

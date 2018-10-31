@@ -18,8 +18,8 @@ namespace WebApplication.Models
         public int Idea_id { get; set; }
         public int User_id { get; set; }
         public string Comment1 { get; set; }
-        public int Timestamp { get; set; }
         public Nullable<bool> Active { get; set; }
+        public Nullable<System.DateTime> Submitted_on { get; set; }
     
         public virtual Idea Idea { get; set; }
         public virtual User User { get; set; }
