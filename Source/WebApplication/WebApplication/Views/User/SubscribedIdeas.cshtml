@@ -6,33 +6,43 @@
 
 <h2>Subscribed Ideas</h2>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('[id="datatable"]').DataTable();
+    });
+</script>
 
 @if (Model != null)
 {
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Id)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Title)
-        </th>
-        <th>
-            Submitted By
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Status)
-        </th>
-        <th></th>
-        <th></th>
-    </tr>
-
+<table class="table table-striped" id="datatable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                Submitted By
+            </th>
+            <th>
+                Team
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
     @foreach (var item in Model)
     {
-        if (item.Subscriptions.Any())
-        {
-            if (item.Subscriptions.First().Active.Value == true)
-            {
+        //if (item.Subscriptions.Any())
+        //{
+        //    if (item.Subscriptions.First().Active.Value == true)
+        //    {
 
 
             <tr>
@@ -45,6 +55,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.User.Username)
                     @* insert code here for displaying username *@
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Team_id)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Status)
@@ -115,34 +128,26 @@
                     </td>
                 }
                 else
-                {
-                    <td></td>}
-                @if (item.Subscriptions.Any())
-                {
-                    if (item.Subscriptions.First().Active.Value == true)
-                    {
-                        <td>
-                            <a href="@Url.Action("Unsubscribe", new { idea_id = item.Id })">Unsubscribe</a>
-                        </td>
-                    }
-                    else
-                    {
-                        <td>
-                            <a href="@Url.Action("Subscribe", new { idea_id = item.Id })">Subscribe</a>
-                        </td>
-                    }
+                { 
+                    <td></td>
                 }
-                else
+                @*@if (item.Subscriptions.Where(x => x.User_id == Convert.ToInt32(Session["UserID"])).Any())
+                {*@
+                    <td>
+                        <a href="@Url.Action("Unsubscribe", new { idea_id = item.Id })">Unsubscribe</a>
+                    </td>
+                @*}*@
+                @*else
                 {
                     <td>
                         <a href="@Url.Action("Subscribe", new { idea_id = item.Id })">Subscribe</a>
                     </td>
-                }
+                }*@
             </tr>
                 }
-            }
-        }
-
+            @*}*@
+        @*}*@
+    </tbody>
     </table>
 
 
