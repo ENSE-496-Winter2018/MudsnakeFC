@@ -6,79 +6,85 @@
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
 </head>
 <body>
-    @if (Session["UserID"] != null)
-    {
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+        @if(Session["UserID"] != null)
+        {
+            <div class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        @Html.ActionLink("eIDEAS", "Index", "User", new { area = "" }, new { @class = "navbar-brand" })
+                    </div>
+                    <div class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <li>@Html.ActionLink("Home", "Index", "User")</li>
+                            <li>@Html.ActionLink("Dashboard", "Dashboard", "User")</li>
+                            <li>@Html.ActionLink("New Idea", "CreateIdea", "User")</li>
+                            <li>@Html.ActionLink("My Ideas", "MyIdeas", "User")</li>
+                            @if (Session["UserType"].ToString() == "approver" || Session["UserType"].ToString() == "superapprover")
+                            {
+                                <li>@Html.ActionLink("Pending Ideas", "PendingIdeas", "User")</li>
+                            }
+                            <li>@Html.ActionLink("Subscribed Ideas", "SubscribedIdeas", "User")</li>
+                            <li>@Html.ActionLink("Success Stories", "SuccessStories", "User")</li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="#"><span class="glyphicon glyphicon-user"></span> @Session["Username"].ToString()</a></li>
+                            <li><a href="@Url.Action("Notifications")">Notifications  @{Html.RenderAction("GetNotificationCount", "User");}</a></li>
+                            <li><a href="@Url.Action("Logout")"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+    }
+    @*<div>
+            @using WebApplication.ViewModels
+            @if (TempData["UserMessage"] != null)
+            {
+                var message = (MessageViewModel)TempData["UserMessage"];
+                <div class="col-lg-offset-1 alert @message.CssClassName alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
-                    @Html.ActionLink("eIDEAS", "Index", "User", new { area = "" }, new { @class = "navbar-brand" })
+                    <strong>@message.Title</strong>
+                    @message.Message
                 </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li>@Html.ActionLink("Home", "Index", "User")</li>
-                        <li>@Html.ActionLink("Dashboard", "Dashboard", "User")</li>
-                        <li>@Html.ActionLink("New Idea", "CreateIdea", "User")</li>
-                        <li>@Html.ActionLink("My Ideas", "MyIdeas", "User")</li>
-                        @if (Session["UserType"].ToString() == "approver" || Session["UserType"].ToString() == "superapprover")
-                        {
-                            <li>@Html.ActionLink("Pending Ideas", "PendingIdeas", "User")</li>
-                        }
-                        <li>@Html.ActionLink("Subscribed Ideas", "SubscribedIdeas", "User")</li>
-                        <li>@Html.ActionLink("Success Stories", "SuccessStories", "User")</li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#"><span class="glyphicon glyphicon-user"></span> @Session["Username"].ToString()</a></li>
-                        <li><a href="@Url.Action("Logout")"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-                    </ul>
+            }
+        </div>*@
+    <div class="container body-content">
+        <div>
+            @using WebApplication.ViewModels
+            @if (TempData["UserMessage"] != null)
+            {
+                var message = (MessageViewModel)TempData["UserMessage"];
+                <div class="col-lg-offset-1 alert @message.CssClassName alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong>@message.Title</strong>
+                    @message.Message
                 </div>
-            </div>
+            }
         </div>
-        }
-        @*<div>
-                @using WebApplication.ViewModels
-                @if (TempData["UserMessage"] != null)
-                {
-                    var message = (MessageViewModel)TempData["UserMessage"];
-                    <div class="col-lg-offset-1 alert @message.CssClassName alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <strong>@message.Title</strong>
-                        @message.Message
-                    </div>
-                }
-            </div>*@
-        <div class="container body-content">
-            <div>
-                @using WebApplication.ViewModels
-                @if (TempData["UserMessage"] != null)
-                {
-                    var message = (MessageViewModel)TempData["UserMessage"];
-                    <div class="col-lg-offset-1 alert @message.CssClassName alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <strong>@message.Title</strong>
-                        @message.Message
-                    </div>
-                }
-            </div>
-            @RenderBody()
-            <hr />
-            <footer>
-                <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-            </footer>
-        </div>
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
 
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("scripts", required: false)
-    </body>
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
 </html>

@@ -19,13 +19,12 @@ namespace WebApplication.Models
         {
             this.Feedbacks = new HashSet<Feedback>();
             this.Ideas = new HashSet<Idea>();
-            this.Notifications = new HashSet<Notification>();
-            this.Notifications1 = new HashSet<Notification>();
             this.Status_log = new HashSet<Status_log>();
             this.Comments = new HashSet<Comment>();
             this.Likes = new HashSet<Like>();
             this.Subscriptions = new HashSet<Subscription>();
             this.Teams = new HashSet<Team>();
+            this.Notifications = new HashSet<Notification>();
         }
     
         public int Id { get; set; }
@@ -43,10 +42,6 @@ namespace WebApplication.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Idea> Ideas { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Notification> Notifications { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Notification> Notifications1 { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Status_log> Status_log { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comments { get; set; }
@@ -59,5 +54,7 @@ namespace WebApplication.Models
         public virtual Team Team { get; set; }
         public virtual User User1 { get; set; }
         public virtual User User2 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

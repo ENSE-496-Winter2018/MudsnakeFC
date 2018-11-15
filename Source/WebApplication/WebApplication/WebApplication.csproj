@@ -272,6 +272,8 @@
     <Content Include="Views\User\ApproveIdea.cshtml" />
     <Content Include="Views\User\PendingIdeas.cshtml" />
     <Content Include="Views\User\SubscribedIdeas.cshtml" />
+    <Content Include="Views\User\Notifications.cshtml" />
+    <Content Include="Views\User\GetNotificationCount.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
