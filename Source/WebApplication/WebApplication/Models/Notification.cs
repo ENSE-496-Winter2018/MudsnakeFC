@@ -15,13 +15,10 @@ namespace WebApplication.Models
     public partial class Notification
     {
         public int Id { get; set; }
-        public int Sender_id { get; set; }
-        public int Receiver_id { get; set; }
+        public int Recipient_id { get; set; }
         public string Message { get; set; }
-        public bool Is_seen { get; set; }
-        public Nullable<bool> Active { get; set; }
+        public bool Active { get; set; }
     
         public virtual User User { get; set; }
-        public virtual User User1 { get; set; }
     }
 }

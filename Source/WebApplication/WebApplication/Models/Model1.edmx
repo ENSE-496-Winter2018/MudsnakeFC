@@ -51,11 +51,9 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Sender_id" Type="int" Nullable="false" />
-          <Property Name="Receiver_id" Type="int" Nullable="false" />
+          <Property Name="Recipient_id" Type="int" Nullable="false" />
           <Property Name="Message" Type="varchar(max)" Nullable="false" />
-          <Property Name="Is_seen" Type="bit" Nullable="false" />
-          <Property Name="Active" Type="bit" />
+          <Property Name="Active" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Status_log">
           <Key>
@@ -185,7 +183,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_NotificationReceiver_User">
+        <Association Name="FK_Notification_User">
           <End Role="User" Type="Self.User" Multiplicity="1" />
           <End Role="Notification" Type="Self.Notification" Multiplicity="*" />
           <ReferentialConstraint>
@@ -193,19 +191,7 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="Notification">
-              <PropertyRef Name="Receiver_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_NotificationSender_User">
-          <End Role="User" Type="Self.User" Multiplicity="1" />
-          <End Role="Notification" Type="Self.Notification" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Notification">
-              <PropertyRef Name="Sender_id" />
+              <PropertyRef Name="Recipient_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -331,11 +317,7 @@
             <End Role="User" EntitySet="User" />
             <End Role="Like" EntitySet="Like" />
           </AssociationSet>
-          <AssociationSet Name="FK_NotificationReceiver_User" Association="Self.FK_NotificationReceiver_User">
-            <End Role="User" EntitySet="User" />
-            <End Role="Notification" EntitySet="Notification" />
-          </AssociationSet>
-          <AssociationSet Name="FK_NotificationSender_User" Association="Self.FK_NotificationSender_User">
+          <AssociationSet Name="FK_Notification_User" Association="Self.FK_Notification_User">
             <End Role="User" EntitySet="User" />
             <End Role="Notification" EntitySet="Notification" />
           </AssociationSet>
@@ -401,19 +383,6 @@
           <NavigationProperty Name="Likes" Relationship="ENSE496Model.FK_Like_Idea" FromRole="Idea" ToRole="Like" />
           <NavigationProperty Name="Subscriptions" Relationship="ENSE496Model.FK_Subscription_Idea" FromRole="Idea" ToRole="Subscription" />
         </EntityType>
-        <EntityType Name="Notification">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Sender_id" Type="Int32" Nullable="false" />
-          <Property Name="Receiver_id" Type="Int32" Nullable="false" />
-          <Property Name="Message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Is_seen" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="User" Relationship="Self.FK_NotificationReceiver_User" FromRole="Notification" ToRole="User" />
-          <NavigationProperty Name="User1" Relationship="Self.FK_NotificationSender_User" FromRole="Notification" ToRole="User" />
-          <Property Name="Active" Type="Boolean" />
-        </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
@@ -427,8 +396,6 @@
           <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Feedbacks" Relationship="Self.FK_Feedback_User" FromRole="User" ToRole="Feedback" />
           <NavigationProperty Name="Ideas" Relationship="Self.FK_Idea_User" FromRole="User" ToRole="Idea" />
-          <NavigationProperty Name="Notifications" Relationship="Self.FK_NotificationReceiver_User" FromRole="User" ToRole="Notification" />
-          <NavigationProperty Name="Notifications1" Relationship="Self.FK_NotificationSender_User" FromRole="User" ToRole="Notification" />
           <NavigationProperty Name="Status_log" Relationship="ENSE496Model.FK_Status_log_User" FromRole="User" ToRole="Status_log" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="Team_id" Type="Int32" />
@@ -439,6 +406,7 @@
           <NavigationProperty Name="Team" Relationship="ENSE496Model.FK_User_Team" FromRole="User" ToRole="Team" />
           <NavigationProperty Name="User1" Relationship="ENSE496Model.FK_User_User" FromRole="User" ToRole="User1" />
           <NavigationProperty Name="User2" Relationship="ENSE496Model.FK_User_User" FromRole="User1" ToRole="User" />
+          <NavigationProperty Name="Notifications" Relationship="ENSE496Model.FK_Notification_User" FromRole="User" ToRole="Notification" />
         </EntityType>
         <Association Name="FK_Feedback_Idea">
           <End Role="Idea" Type="Self.Idea" Multiplicity="1" />
@@ -476,34 +444,9 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_NotificationReceiver_User">
-          <End Role="User" Type="Self.User" Multiplicity="1" />
-          <End Role="Notification" Type="Self.Notification" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Notification">
-              <PropertyRef Name="Receiver_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_NotificationSender_User">
-          <End Role="User" Type="Self.User" Multiplicity="1" />
-          <End Role="Notification" Type="Self.Notification" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Notification">
-              <PropertyRef Name="Sender_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="ENSE496Entities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Feedbacks" EntityType="Self.Feedback" />
           <EntitySet Name="Ideas" EntityType="Self.Idea" />
-          <EntitySet Name="Notifications" EntityType="Self.Notification" />
           <EntitySet Name="Users" EntityType="Self.User" />
           <AssociationSet Name="FK_Feedback_Idea" Association="Self.FK_Feedback_Idea">
             <End Role="Idea" EntitySet="Ideas" />
@@ -516,14 +459,6 @@
           <AssociationSet Name="FK_Idea_User" Association="Self.FK_Idea_User">
             <End Role="User" EntitySet="Users" />
             <End Role="Idea" EntitySet="Ideas" />
-          </AssociationSet>
-          <AssociationSet Name="FK_NotificationReceiver_User" Association="Self.FK_NotificationReceiver_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Notification" EntitySet="Notifications" />
-          </AssociationSet>
-          <AssociationSet Name="FK_NotificationSender_User" Association="Self.FK_NotificationSender_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Notification" EntitySet="Notifications" />
           </AssociationSet>
           <FunctionImport Name="sp_alterdiagram">
             <Parameter Name="diagramname" Mode="In" Type="String" />
@@ -603,6 +538,11 @@
           <AssociationSet Name="FK_User_User" Association="ENSE496Model.FK_User_User">
             <End Role="User" EntitySet="Users" />
             <End Role="User1" EntitySet="Users" />
+          </AssociationSet>
+          <EntitySet Name="Notifications" EntityType="ENSE496Model.Notification" />
+          <AssociationSet Name="FK_Notification_User" Association="ENSE496Model.FK_Notification_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Notification" EntitySet="Notifications" />
           </AssociationSet>
         </EntityContainer>
         <ComplexType Name="sp_helpdiagramdefinition_Result">
@@ -808,6 +748,28 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Notification">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Recipient_id" Type="Int32" Nullable="false" />
+          <Property Name="Message" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="ENSE496Model.FK_Notification_User" FromRole="Notification" ToRole="User" />
+        </EntityType>
+        <Association Name="FK_Notification_User">
+          <End Type="ENSE496Model.User" Role="User" Multiplicity="1" />
+          <End Type="ENSE496Model.Notification" Role="Notification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Notification">
+              <PropertyRef Name="Recipient_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -834,18 +796,6 @@
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Notifications">
-            <EntityTypeMapping TypeName="ENSE496Model.Notification">
-              <MappingFragment StoreEntitySet="Notification">
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Sender_id" ColumnName="Sender_id" />
-                <ScalarProperty Name="Receiver_id" ColumnName="Receiver_id" />
-                <ScalarProperty Name="Message" ColumnName="Message" />
-                <ScalarProperty Name="Is_seen" ColumnName="Is_seen" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -915,6 +865,16 @@
                 <ScalarProperty Name="Leader" ColumnName="Leader" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notifications">
+            <EntityTypeMapping TypeName="ENSE496Model.Notification">
+              <MappingFragment StoreEntitySet="Notification">
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="Recipient_id" ColumnName="Recipient_id" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

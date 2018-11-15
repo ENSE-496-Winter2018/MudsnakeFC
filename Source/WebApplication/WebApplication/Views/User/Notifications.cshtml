@@ -1,0 +1,30 @@
+﻿@model IEnumerable<WebApplication.Models.Notification>
+
+@{
+    ViewBag.Title = "Notifications";
+}
+
+<h2> Notifications (@Model.Count().ToString())</h2>
+<br />
+@if (Model != null)
+{
+<table class="table table-striped" id="datatable">
+    @foreach (var item in Model)
+    {
+    <div class="col-sm-8">
+        <div class="panel panel-default">
+            @*<div class="panel-heading">
+                <strong>@comment.User.Username</strong> <span class="text-muted"> commented on @comment.Submitted_on.Value.ToString("MMMM dd, yyyy")</span>
+            </div>*@
+            <div class="panel-body">
+                <div class="col-sm-1">
+                    <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                </div>
+                <strong>@item.Message </strong>
+                <a style="float: right;" href="@Url.Action("DismissNotification", new { id = item.Id})">Dismiss</a>
+            </div>
+        </div>
+    </div>
+    }
+</table>
+}
