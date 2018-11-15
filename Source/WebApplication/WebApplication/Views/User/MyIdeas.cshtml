@@ -6,7 +6,14 @@
 
 <h2>My Ideas</h2>
 
-<table class="table">
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('[id="datatable"]').DataTable();
+    });
+</script>
+
+<table class="table table-striped" id="datatable">
+    <thead>
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Id)
@@ -22,7 +29,8 @@
         </th>
         <th></th>
     </tr>
-
+    </thead>
+    <tbody>
 @foreach (var item in Model) {
     <tr>
         <td>
@@ -103,5 +111,6 @@
         </td>
     </tr>
 }
+</tbody>
 
 </table>
