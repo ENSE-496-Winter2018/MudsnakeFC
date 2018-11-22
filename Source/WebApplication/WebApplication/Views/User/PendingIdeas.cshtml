@@ -3,89 +3,186 @@
     ViewBag.Title = "PendingIdeas";
 }
 <h2>Pending Ideas</h2>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Id)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Title)
-        </th>
-        <th>
-            Submitted By
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Status)
-        </th>
-        <th></th>
-    </tr>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                <a href="@Url.Action("ViewIdea", new {Id = item.Id})">@Html.DisplayFor(modelItem => item.Id)</a>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Username)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                <li class="dropdown" style="list-style: none">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>
-                    <ul class="dropdown-menu" role="menu">
-                        @if (item.Status == "Pending")
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('[id="datatable1"]').DataTable();
+    });
+</script>
+
+@if (Model != null)
+{
+    <table class="table table-striped" id="datatable1">
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    Status
+                </th>
+                <th></th>
+                <th>
+                    Comments
+                </th>
+                <th>
+                    Likes
+                </th>
+                <th></th>
+                <th>Submitted by</th>
+                <th>Team</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <button title="View Idea details" type="button" onclick="location.href='@Url.Action("ViewIdea", new { Id = item.Id })'" class="btn btn-success">IDEA #@item.Id <br /><span style="font-size: 25px" class="glyphicon glyphicon-circle-arrow-right"></span></button>
+                    </td>
+                    <td>
+                        <strong>@Html.DisplayFor(modelItem => item.Title)</strong>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        @if (item.User_id == Convert.ToInt32(Session["UserID"]) || (Session["TeamID"].Equals(item.User.Team_id.Value) && Session["UserType"].ToString() == "approver") || Session["UserType"].ToString() == "superapprover")
                         {
-                            <li>
-                                <a href="@Url.Action("EditIdea", new { id = item.Id })">Edit</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("ApproveIdea", new { id = item.Id })">Approve</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("DeclineIdea", new { id = item.Id })">Decline</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
-                            </li>
-                        }
-                        @if (item.Status == "Parked")
+                            <li class="dropdown" style="list-style: none">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button>
+                                <ul class="dropdown-menu" role="menu">
+                                @if (item.Status == "Pending")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("EditIdea", new { id = item.Id })">Edit</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                                    </li>
+                                    if ((Session["TeamID"].Equals(item.User.Team_id.Value) && Session["UserType"].ToString() == "approver"))
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("ApproveIdea", new { id = item.Id })">Approve</a>
+                                        </li>
+                                    }
+                                    <li>
+                                        <a href="@Url.Action("DeclineIdea", new { id = item.Id })">Decline</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+                                @if (item.Status == "Parked")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("EditIdea", new { id = item.Id })">Edit</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeclineIdea", new { id = item.Id })">Decline</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+
+                                @if (item.Status == "Declined")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+
+                                @if (item.Status == "Planned")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+
+                                    @if (item.Status == "Approved")
+                                {
+                                    <li>
+                                        <a href="@Url.Action("ParkIdea", new { id = item.Id })">Park</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("PlanIdea", new { id = item.Id })">Plan</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
+                                    </li>
+                                }
+
+                            </ul>
+                        </li>
+                    }
+                    </td>
+                    <td>
+                        <button title="View Comments" type="button" onclick="location.href='@Url.Action("ViewIdea", new { id = item.Id })'" class="btn btn-warning">
+                            <span class="glyphicon glyphicon-comment"></span> @item.Comments.Count
+                        </button>
+                    </td>
+                    <td>
+                        <style>
+                            .like, .unlike {
+                                border: 1px solid black;
+                                color: black;
+                                cursor: pointer;
+                            }
+
+                            .like {
+                                background-color: white;
+                                border-color: #2196F3;
+                                color: dodgerblue
+                            }
+
+                                .like:hover {
+                                    background: #2196F3;
+                                    color: white;
+                                }
+
+                            .unlike {
+                                background-color: #2196F3;
+                                border-color: #2196F3;
+                                color: white
+                            }
+                        </style>
+                        @{int userId = Convert.ToInt32(Session["UserID"]);}
+                        @if (item.Likes.Where(x => x.User_id == userId).Any())
                         {
-                            <li>
-                                <a href="@Url.Action("EditIdea", new { id = item.Id })">Edit</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("DeclineIdea", new { id = item.Id })">Decline</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
-                            </li>
-                            <li>
-                                <a href="@Url.Action("PlanIdea", new { id = item.Id })">Plan</a>
-                            </li>
+                            <button title="Unlike Idea" type="button" onclick="location.href='@Url.Action("UnlikeIdea", new { idea_id = item.Id })'" class="btn-sm unlike" style=""><span class="glyphicon glyphicon-thumbs-up"></span></button>
                         }
-                        @if (item.Status == "Declined")
+                        else
                         {
-                            <li>
-                                <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
-                            </li>
+                            <button title="Like Idea" type="button" onclick="location.href='@Url.Action("LikeIdea", new { idea_id = item.Id })'" class="btn-sm like" style=""><span class="glyphicon glyphicon-thumbs-up"></span></button>
                         }
-                        @if (item.Status == "Plan")
-                        {
-                            <li>
-                                <a href="@Url.Action("DeleteIdea", new { id = item.Id })">Delete</a>
-                            </li>
-                        }
-                    </ul>
-                </li>
-            </td>
-        </tr>
-    }
-</table>
+                        <strong> @item.Likes.Count</strong>
+                    </td>
+
+                    @if (item.Subscriptions.Where(x => x.User_id == Convert.ToInt32(Session["UserID"])).Any())
+                    {
+                        <td>
+                            <button title="Unsubscribe from Idea" type="button" onclick="location.href='@Url.Action("Unsubscribe", new { idea_id = item.Id })'" class="btn btn-danger">Unsubscribe</button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <button title="Subscribe to Idea" type="button" onclick="location.href='@Url.Action("Subscribe", new { idea_id = item.Id })'" class="btn btn-danger">Subscribe</button>
+                        </td>
+                    }
+                    <td><img src="\Images\avatar-icon-png-2.png" style="vertical-align: middle; width: 70px; height: 70px; border-radius: 50%;" class="avatar" alt="Avatar"> @Html.DisplayFor(modelItem => item.User.Username)</td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.Team_id)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

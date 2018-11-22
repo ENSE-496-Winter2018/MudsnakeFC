@@ -32,6 +32,22 @@ namespace WebApplication.Controllers
                             }
                             //idea.Subscriptions.Where(x => x.User_id == Convert.ToInt32(Session["UserID"]) && x.Idea_id == idea.Id).FirstOrDefault();
                             idea.Subscriptions.ToList();
+                            idea.Comments = context.Comments.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                            if (idea.Comments.Count > 0)
+                            {
+                                foreach (Comment comment in idea.Comments)
+                                {
+                                    comment.User.Username.First();
+                                }
+                            }
+                            idea.Likes = context.Likes.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                            if(idea.Likes.Count > 0)
+                            {
+                                foreach (Like like in idea.Likes)
+                                {
+                                    like.User.Username.First();
+                                }
+                            }
                         }
                     }
                     return View(ideas);
@@ -45,6 +61,8 @@ namespace WebApplication.Controllers
         [HttpGet]
         public ActionResult Login()
         {
+            if (Session["UserID"] != null)
+                return RedirectToAction("Index");
             return View();
         }
 
@@ -100,15 +118,9 @@ namespace WebApplication.Controllers
         {
             using (var context = new ENSE496Entities()) {
                 if (Session["UserID"] != null) {
-                    if ((String.IsNullOrEmpty(ideaParam.Title)) || (String.IsNullOrEmpty(ideaParam.Description))) {
-                        TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "You have left either the title or description empty" };
-                        return RedirectToAction("CreateIdea");
-                    }
-                    else if (ideaParam.Title.Length > 255) {
-                        TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "The title must be less than 256 characters" };
-                        return RedirectToAction("CreateIdea");
-                    }
-                    else {
+
+                    if(ModelState.IsValid)
+                    {
                         Idea newIdea = new Idea();
                         newIdea.Title = ideaParam.Title;
                         newIdea.Description = ideaParam.Description;
@@ -136,6 +148,23 @@ namespace WebApplication.Controllers
                         foreach (Idea idea in ideas)
                         {
                             idea.User.Username.First();
+                            idea.Subscriptions.ToList();
+                            idea.Comments = context.Comments.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                            if (idea.Comments.Count > 0)
+                            {
+                                foreach (Comment comment in idea.Comments)
+                                {
+                                    comment.User.Username.First();
+                                }
+                            }
+                            idea.Likes = context.Likes.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                            if (idea.Likes.Count > 0)
+                            {
+                                foreach (Like like in idea.Likes)
+                                {
+                                    like.User.Username.First();
+                                }
+                            }
                         }
                     }
                     return View(ideas);
@@ -154,10 +183,15 @@ namespace WebApplication.Controllers
 
         public ActionResult DeleteIdea(int id) {
             using (var context = new ENSE496Entities()) {
+                context.Status_log.RemoveRange(context.Status_log.Where(x => x.Idea_id == id).ToList());
+                context.Likes.RemoveRange(context.Likes.Where(x => x.Idea_id == id).ToList());
+                context.Comments.RemoveRange(context.Comments.Where(x => x.Idea_id == id).ToList());
+                context.Subscriptions.RemoveRange(context.Subscriptions.Where(x => x.Idea_id == id).ToList());
                 context.Ideas.Remove(context.Ideas.Where(x => x.Id == id).FirstOrDefault());
-                context.Status_log.Remove(context.Status_log.Where(x => x.Idea_id == id).FirstOrDefault());
+                //context.Status_log.Remove(context.Status_log.Where(x => x.Idea_id == id).FirstOrDefault());
+                //context.Ideas.Where(x => x.Id == id).FirstOrDefault().Active = false;
                 context.SaveChanges();
-                return RedirectToAction("MyIdeas");
+                return RedirectToAction("Index");
             }               
         }
 
@@ -178,44 +212,91 @@ namespace WebApplication.Controllers
         {
             using (var context = new ENSE496Entities())
             {
-                Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
-                Status_log statusLog = new Status_log();
-                statusLog.Current_status = "Parked";
-                statusLog.Previous_status = idea.Status;
-                statusLog.Idea_id = statusLogParam.Idea_id;
-                statusLog.User_id = Convert.ToInt32(Session["UserID"]);
-                statusLog.Description = statusLogParam.Description;
-                context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Parked";
-                context.Status_log.Add(statusLog);
+                if (ModelState.IsValid)
+                {
+                    Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
+                    Status_log statusLog = new Status_log();
+                    statusLog.Current_status = "Parked";
+                    statusLog.Previous_status = idea.Status;
+                    statusLog.Idea_id = statusLogParam.Idea_id;
+                    statusLog.User_id = Convert.ToInt32(Session["UserID"]);
+                    statusLog.Description = statusLogParam.Description;
+                    context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Parked";
+                    context.Status_log.Add(statusLog);
 
-                if(idea.User_id != statusLog.User_id) //checks to see if status change was made by someone other than who submitted the idea
-                {
-                    Notification notification = new Notification();
-                    notification.Recipient_id = idea.User_id;
-                    notification.Message = Session["Username"].ToString() + " has parked your idea. (Idea #" + statusLog.Idea_id.ToString() + ")";
-                    notification.Active = true;
-                    context.Notifications.Add(notification);
-                }
-                if(context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).Any())
-                {
-                    var subs = context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).ToList();
-                    foreach (Subscription sub in subs)
+                    if (idea.User_id != statusLog.User_id) //checks to see if status change was made by someone other than who submitted the idea
                     {
                         Notification notification = new Notification();
-                        notification.Recipient_id = sub.User_id;
-                        notification.Message = Session["Username"].ToString() + " has parked an idea you are subscribed to. (Idea #" + statusLog.Idea_id.ToString() + ")";
+                        notification.Recipient_id = idea.User_id;
+                        notification.Message = Session["Username"].ToString() + " has parked your idea. (Idea #" + statusLog.Idea_id.ToString() + ")";
                         notification.Active = true;
                         context.Notifications.Add(notification);
                     }
+                    if (context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).Any())
+                    {
+                        var subs = context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).ToList();
+                        foreach (Subscription sub in subs)
+                        {
+                            Notification notification = new Notification();
+                            notification.Recipient_id = sub.User_id;
+                            notification.Message = Session["Username"].ToString() + " has parked an idea you are subscribed to. (Idea #" + statusLog.Idea_id.ToString() + ")";
+                            notification.Active = true;
+                            context.Notifications.Add(notification);
+                        }
+                    }
+                    context.SaveChanges();
+                    return RedirectToAction("Index");
                 }
-                context.SaveChanges();
-                return RedirectToAction("Index");
+                return View();
             }
         }
 
 
         public ActionResult PlanIdea(int id) {
             return View();
+        }
+
+        public  ActionResult PlanIdea(Status_log statusLogParam)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                if (ModelState.IsValid)
+                {
+                    Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
+                    Status_log statusLog = new Status_log();
+                    statusLog.Current_status = "Planned";
+                    statusLog.Previous_status = idea.Status;
+                    statusLog.Idea_id = statusLogParam.Idea_id;
+                    statusLog.User_id = Convert.ToInt32(Session["UserID"]);
+                    statusLog.Description = statusLogParam.Description;
+                    context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Planned";
+                    context.Status_log.Add(statusLog);
+
+                    if (idea.User_id != statusLog.User_id) //checks to see if status change was made by someone other than who submitted the idea
+                    {
+                        Notification notification = new Notification();
+                        notification.Recipient_id = idea.User_id;
+                        notification.Message = Session["Username"].ToString() + " has planned your idea. (Idea #" + statusLog.Idea_id.ToString() + ")";
+                        notification.Active = true;
+                        context.Notifications.Add(notification);
+                    }
+                    if (context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).Any())
+                    {
+                        var subs = context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).ToList();
+                        foreach (Subscription sub in subs)
+                        {
+                            Notification notification = new Notification();
+                            notification.Recipient_id = sub.User_id;
+                            notification.Message = Session["Username"].ToString() + " has planned an idea you are subscribed to. (Idea #" + statusLog.Idea_id.ToString() + ")";
+                            notification.Active = true;
+                            context.Notifications.Add(notification);
+                        }
+                    }
+                    context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                return View();
+            }
         }
 
         [HttpGet]
@@ -229,38 +310,43 @@ namespace WebApplication.Controllers
         [HttpPost]
         public ActionResult EditIdea(Idea ideaParam) {
             using (var context = new ENSE496Entities()) {
-                context.Ideas.Where(x => x.Id == ideaParam.Id).First().Title = ideaParam.Title;
-                context.Ideas.Where(x => x.Id == ideaParam.Id).First().Description = ideaParam.Description;
-                //if (ideaParam.User_id != Convert.ToInt32(Session["UserID"])) //checks to see if edit was made by someone other than who submitted the idea
-                //{
-                //    Notification notification = new Notification();
-                //    notification.Recipient_id = ideaParam.User_id;
-                //    notification.Message = Session["Username"].ToString() + " has edited your idea. (Idea #" + ideaParam.Id.ToString() + ")";
-                //    notification.Active = true;
-                //    context.Notifications.Add(notification);
-                //}
-                //if (context.Subscriptions.Where(x => x.Idea_id == ideaParam.Id).Any())
-                //{
-                //    var subs = context.Subscriptions.Where(x => x.Idea_id == ideaParam.Id).ToList();
-                //    foreach (Subscription sub in subs)
-                //    {
-                //        Notification notification = new Notification();
-                //        notification.Recipient_id = sub.User_id;
-                //        notification.Message = Session["Username"].ToString() + " has edited an idea you are subscribed to. (Idea #" + ideaParam.Id.ToString() + ")";
-                //        notification.Active = true;
-                //        context.Notifications.Add(notification);
-                //    }
-                //}
-                context.SaveChanges();
-                //if (ideaParam.User_id != statusLog.User_id) //checks to see if edit was made by someone other than who submitted the idea
-                //{
-                //    Notification notification = new Notification();
-                //    notification.Recipient_id = idea.User_id;
-                //    notification.Message = Session["Username"].ToString() + " has parked your idea. (Idea #" + statusLog.Idea_id.ToString() + ")";
-                //    notification.Active = true;
-                //    context.Notifications.Add(notification);
-                //}
-                return RedirectToAction("Index");
+                if(ModelState.IsValid)
+                {
+                    context.Ideas.Where(x => x.Id == ideaParam.Id).First().Title = ideaParam.Title;
+                    context.Ideas.Where(x => x.Id == ideaParam.Id).First().Description = ideaParam.Description;
+                    //if (ideaParam.User_id != Convert.ToInt32(Session["UserID"])) //checks to see if edit was made by someone other than who submitted the idea
+                    //{
+                    //    Notification notification = new Notification();
+                    //    notification.Recipient_id = ideaParam.User_id;
+                    //    notification.Message = Session["Username"].ToString() + " has edited your idea. (Idea #" + ideaParam.Id.ToString() + ")";
+                    //    notification.Active = true;
+                    //    context.Notifications.Add(notification);
+                    //}
+                    //if (context.Subscriptions.Where(x => x.Idea_id == ideaParam.Id).Any())
+                    //{
+                    //    var subs = context.Subscriptions.Where(x => x.Idea_id == ideaParam.Id).ToList();
+                    //    foreach (Subscription sub in subs)
+                    //    {
+                    //        Notification notification = new Notification();
+                    //        notification.Recipient_id = sub.User_id;
+                    //        notification.Message = Session["Username"].ToString() + " has edited an idea you are subscribed to. (Idea #" + ideaParam.Id.ToString() + ")";
+                    //        notification.Active = true;
+                    //        context.Notifications.Add(notification);
+                    //    }
+                    //}
+                    context.SaveChanges();
+                    //if (ideaParam.User_id != statusLog.User_id) //checks to see if edit was made by someone other than who submitted the idea
+                    //{
+                    //    Notification notification = new Notification();
+                    //    notification.Recipient_id = idea.User_id;
+                    //    notification.Message = Session["Username"].ToString() + " has parked your idea. (Idea #" + statusLog.Idea_id.ToString() + ")";
+                    //    notification.Active = true;
+                    //    context.Notifications.Add(notification);
+                    //}
+                    return RedirectToAction("Index");
+                }
+                return View();
+          
             }
         }
 
@@ -344,18 +430,18 @@ namespace WebApplication.Controllers
             {
                 if (Session["UserID"] != null)
                 {
-                    //if (String.IsNullOrEmpty(commentParam.Comment1))
-                    //{
-                    //    TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "You have left the comment empty" };
-                    //    return RedirectToAction("CreateIdea");
-                    //}
-                    //else
-                    //{
+                    if (String.IsNullOrEmpty(commentParam.Comment1))
+                    {
+                        TempData["UserMessage"] = new MessageViewModel() { CssClassName = "alert-danger", Message = "You cannot leave the comment field empty..." };
+                        return RedirectToAction("ViewIdea", new { id = commentParam.Idea_id });
+                    }
+                    else
+                    {
                         Idea idea = context.Ideas.Where(x => x.Id == commentParam.Idea_id).FirstOrDefault();
                         Comment newComment = new Comment();
                         newComment.Idea_id = commentParam.Idea_id;
                         newComment.Comment1 = commentParam.Comment1;
-                        newComment.User_id  = Convert.ToInt32(Session["UserID"]);
+                        newComment.User_id = Convert.ToInt32(Session["UserID"]);
                         newComment.Submitted_on = DateTime.Now;
                         newComment.Active = true;
                         context.Comments.Add(newComment);
@@ -379,8 +465,9 @@ namespace WebApplication.Controllers
                                 context.Notifications.Add(notification);
                             }
                         }
-                    context.SaveChanges();
+                        context.SaveChanges();
                         return RedirectToAction("ViewIdea", new { id = commentParam.Idea_id });
+                    }
                     //}
                 }
                 return View();
@@ -408,7 +495,7 @@ namespace WebApplication.Controllers
                         context.Likes.Add(newLike);
                     }
                     context.SaveChanges();
-                    return RedirectToAction("ViewIdea", new { id = idea_id });
+                    return Redirect(Request.UrlReferrer.ToString());
                 }
                 return View();
             }
@@ -423,12 +510,10 @@ namespace WebApplication.Controllers
                 if (Session["UserID"] != null)
                 {
                     int userId = Convert.ToInt32(Session["UserID"]);
-                    //if (context.Likes.Where(x => x.User_id == Convert.ToInt32(Session["UserID"])).Any()) //checks if user has any inactive likes already stored in DB
-                    //{
                     context.Likes.Where(x => x.User_id == userId && x.Idea_id == idea_id).First().Active = false;
+                    context.Likes.RemoveRange(context.Likes.Where(x => x.User_id == userId && x.Idea_id == idea_id).ToList());
                     context.SaveChanges();
-                    //}
-                    return RedirectToAction("ViewIdea", new { id = idea_id });
+                    return Redirect(Request.UrlReferrer.ToString());
                 }
                 return View();
             }
@@ -458,6 +543,23 @@ namespace WebApplication.Controllers
                             foreach (Idea idea in ideas)
                             {
                                 idea.User.Username.First();
+                                idea.Subscriptions.ToList();
+                                idea.Comments = context.Comments.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                                if (idea.Comments.Count > 0)
+                                {
+                                    foreach (Comment comment in idea.Comments)
+                                    {
+                                        comment.User.Username.First();
+                                    }
+                                }
+                                idea.Likes = context.Likes.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                                if (idea.Likes.Count > 0)
+                                {
+                                    foreach (Like like in idea.Likes)
+                                    {
+                                        like.User.Username.First();
+                                    }
+                                }
                             }
                         }
                         return View(ideas);
@@ -470,8 +572,26 @@ namespace WebApplication.Controllers
                             foreach (Idea idea in ideas)
                             {
                                 idea.User.Username.First();
+                                idea.Subscriptions.ToList();
+                                idea.Comments = context.Comments.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                                if (idea.Comments.Count > 0)
+                                {
+                                    foreach (Comment comment in idea.Comments)
+                                    {
+                                        comment.User.Username.First();
+                                    }
+                                }
+                                idea.Likes = context.Likes.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                                if (idea.Likes.Count > 0)
+                                {
+                                    foreach (Like like in idea.Likes)
+                                    {
+                                        like.User.Username.First();
+                                    }
+                                }
                             }
                         }
+
                         return View(ideas);
                     }
                     else
@@ -503,37 +623,41 @@ namespace WebApplication.Controllers
         {
             using (var context = new ENSE496Entities())
             {
-                Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
-                Status_log statusLog = new Status_log();
-                statusLog.Current_status = "Approved";
-                statusLog.Previous_status = idea.Status;
-                statusLog.Idea_id = statusLogParam.Idea_id;
-                statusLog.User_id = Convert.ToInt32(Session["UserID"]);
-                statusLog.Description = statusLogParam.Description;
-                context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Approved";
-                context.Status_log.Add(statusLog);
-                if (idea.User_id != statusLog.User_id) //checks to see if status change was made by someone other than who submitted the idea
+                if (ModelState.IsValid)
                 {
-                    Notification notification = new Notification();
-                    notification.Recipient_id = idea.User_id;
-                    notification.Message = Session["Username"].ToString() + " has approved your idea. (Idea #" + statusLog.Idea_id.ToString() + ")";
-                    notification.Active = true;
-                    context.Notifications.Add(notification);
-                }
-                if (context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).Any())
-                {
-                    var subs = context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).ToList();
-                    foreach (Subscription sub in subs)
+                    Idea idea = context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault();
+                    Status_log statusLog = new Status_log();
+                    statusLog.Current_status = "Approved";
+                    statusLog.Previous_status = idea.Status;
+                    statusLog.Idea_id = statusLogParam.Idea_id;
+                    statusLog.User_id = Convert.ToInt32(Session["UserID"]);
+                    statusLog.Description = statusLogParam.Description;
+                    context.Ideas.Where(x => x.Id == statusLogParam.Idea_id).FirstOrDefault().Status = "Approved";
+                    context.Status_log.Add(statusLog);
+                    if (idea.User_id != statusLog.User_id) //checks to see if status change was made by someone other than who submitted the idea
                     {
                         Notification notification = new Notification();
-                        notification.Recipient_id = sub.User_id;
-                        notification.Message = Session["Username"].ToString() + " has approved an idea you are subscribed to. (Idea #" + statusLog.Idea_id.ToString() + ")";
+                        notification.Recipient_id = idea.User_id;
+                        notification.Message = Session["Username"].ToString() + " has approved your idea. (Idea #" + statusLog.Idea_id.ToString() + ")";
                         notification.Active = true;
                         context.Notifications.Add(notification);
                     }
+                    if (context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).Any())
+                    {
+                        var subs = context.Subscriptions.Where(x => x.Idea_id == statusLog.Idea_id).ToList();
+                        foreach (Subscription sub in subs)
+                        {
+                            Notification notification = new Notification();
+                            notification.Recipient_id = sub.User_id;
+                            notification.Message = Session["Username"].ToString() + " has approved an idea you are subscribed to. (Idea #" + statusLog.Idea_id.ToString() + ")";
+                            notification.Active = true;
+                            context.Notifications.Add(notification);
+                        }
+                    }
+                    context.SaveChanges();
+                    return RedirectToAction("Index");
                 }
-                context.SaveChanges();
-                return RedirectToAction("Index");
+                return View();
             }
         }
 
@@ -559,9 +683,9 @@ namespace WebApplication.Controllers
                         context.Subscriptions.Add(subscription);
                     //}
                     context.SaveChanges();
-                    return RedirectToAction("Index");
+                    return Redirect(Request.UrlReferrer.ToString());
                 }
-                return View();
+                return RedirectToAction("Index");
             }
         }
 
@@ -577,9 +701,9 @@ namespace WebApplication.Controllers
                     //context.Subscriptions.Where(x => x.User_id == userId && x.Idea_id == idea_id);
                     context.Subscriptions.RemoveRange(context.Subscriptions.Where(x => x.User_id == userId && x.Idea_id == idea_id).ToList());
                     context.SaveChanges();
-                    return RedirectToAction("Index");
+                    return Redirect(Request.UrlReferrer.ToString());
                 }
-                return View();
+                return RedirectToAction("Index");
             }
         }
 
@@ -602,7 +726,23 @@ namespace WebApplication.Controllers
                             idea.User.Team_id.GetValueOrDefault();
                         else
                             idea.User.Team_id = 0;
-                        //idea.Subscriptions.Where(x => x.User_id == Convert.ToInt32(Session["UserID"]) && x.Idea_id == idea.Id).FirstOrDefault();
+                        idea.Subscriptions.ToList();
+                        idea.Comments = context.Comments.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                        if (idea.Comments.Count > 0)
+                        {
+                            foreach (Comment comment in idea.Comments)
+                            {
+                                comment.User.Username.First();
+                            }
+                        }
+                        idea.Likes = context.Likes.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                        if (idea.Likes.Count > 0)
+                        {
+                            foreach (Like like in idea.Likes)
+                            {
+                                like.User.Username.First();
+                            }
+                        }
                     }
                     //}
                     return View(ideas);
