@@ -176,9 +176,95 @@ namespace WebApplication.Controllers
             }
         }
 
+        public ActionResult AddSuccessStories(int idea_id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    Idea idea = context.Ideas.Where(x => x.Id == idea_id).FirstOrDefault();
+                    idea.OnSuccessStories = true;
+                    context.SaveChanges();
+                    return Redirect(Request.UrlReferrer.ToString());
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
+            }
+        }
+
+        public ActionResult RemoveSuccessStories(int idea_id)
+        {
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    Idea idea = context.Ideas.Where(x => x.Id == idea_id).FirstOrDefault();
+                    idea.OnSuccessStories = false;
+                    context.SaveChanges();
+                    return Redirect(Request.UrlReferrer.ToString());
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
+            }
+        }
+
         public ActionResult SuccessStories()
         {
-            return View();
+            using (var context = new ENSE496Entities())
+            {
+                if (Session["UserID"] != null)
+                {
+                    string type = Session["UserType"].ToString();
+                    int userId = Convert.ToInt32(Session["UserID"]);
+                    var successIdeas = context.Ideas.Where(x => x.Status == "Approved").ToList();
+
+                    if(type!="superapprover")
+                    {
+                        successIdeas = null;
+                        successIdeas = context.Ideas.Where(x => x.OnSuccessStories == true).ToList();
+                    }
+
+                    if (successIdeas!=null && successIdeas.Count > 0)
+                    {
+                        foreach (Idea idea in successIdeas)
+                        {
+                            idea.User.Username.First();
+                            if (idea.User.Team_id.HasValue)
+                                idea.User.Team_id.GetValueOrDefault();
+                            else
+                                idea.User.Team_id = 0;
+                            idea.Subscriptions.ToList();
+                            idea.Comments = context.Comments.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                            if (idea.Comments.Count > 0)
+                            {
+                                foreach (Comment comment in idea.Comments)
+                                {
+                                    comment.User.Username.First();
+                                }
+                            }
+                            idea.Likes = context.Likes.Where(x => x.Idea_id == idea.Id && x.Active == true).ToList();
+                            if (idea.Likes.Count > 0)
+                            {
+                                foreach (Like like in idea.Likes)
+                                {
+                                    like.User.Username.First();
+                                }
+                            }
+                        }
+                    }
+                    //}
+                    return View(successIdeas);
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
+
+            }
         }
 
         public ActionResult DeleteIdea(int id) {

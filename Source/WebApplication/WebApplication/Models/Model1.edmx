@@ -36,6 +36,7 @@
           <Property Name="Description" Type="varchar(max)" Nullable="false" />
           <Property Name="Status" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Active" Type="bit" />
+          <Property Name="OnSuccessStories" Type="bit" />
         </EntityType>
         <EntityType Name="Like">
           <Key>
@@ -382,6 +383,7 @@
           <NavigationProperty Name="Comments" Relationship="ENSE496Model.FK_Comment_Idea" FromRole="Idea" ToRole="Comment" />
           <NavigationProperty Name="Likes" Relationship="ENSE496Model.FK_Like_Idea" FromRole="Idea" ToRole="Like" />
           <NavigationProperty Name="Subscriptions" Relationship="ENSE496Model.FK_Subscription_Idea" FromRole="Idea" ToRole="Subscription" />
+          <Property Name="OnSuccessStories" Type="Boolean" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -790,6 +792,7 @@
           <EntitySetMapping Name="Ideas">
             <EntityTypeMapping TypeName="ENSE496Model.Idea">
               <MappingFragment StoreEntitySet="Idea">
+                <ScalarProperty Name="OnSuccessStories" ColumnName="OnSuccessStories" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="User_id" ColumnName="User_id" />
