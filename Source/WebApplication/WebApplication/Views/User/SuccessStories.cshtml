@@ -10,7 +10,6 @@
         $('[id="datatable1"]').DataTable();
     });
 </script>
-
 @if (Model != null)
 {
     <table class="table table-striped" id="datatable1">
@@ -25,13 +24,13 @@
                 <th>
                     Status
                 </th>                   
-                <th></th>
                 <th>
                     Comments
                 </th>
                 <th>
                     Likes
                 </th>
+                <th></th>
                 <th>Submitted by</th>
                 <th>Team</th>
                 <th></th>
@@ -113,6 +112,9 @@
 
                     @if (Session["UserType"].ToString() == "superapprover")
                     {
+                        <td>
+                            <a href="@Url.Action("EditIdea", new { id = item.Id })">Edit</a>
+                        </td>
                         if (item.OnSuccessStories==null || item.OnSuccessStories == false)
                         {
                         <td>
