@@ -12,6 +12,39 @@
     });
 </script>
 
+<style>
+    .like, .unlike {
+        border: 1px solid black;
+        /*background-color: white;*/
+        color: black;
+        /*padding: 14px 28px;*/
+        /*font-size: 16px;*/
+        cursor: pointer;
+    }
+    /* Blue */
+    .like {
+        background-color: white;
+        border-color: #2196F3;
+        color: dodgerblue
+    }
+
+        .like:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+    .unlike {
+        background-color: #2196F3;
+        border-color: #2196F3;
+        color: white
+    }
+
+    /*.unlike:hover {
+                                    background: #2196F3;
+                                    color: white;
+                                }*/
+</style>
+
 @if (Model != null)
 {
     <table class="table table-striped" id="datatable">
@@ -46,7 +79,7 @@
                         <button title="View Idea details" type="button" onclick="location.href='@Url.Action("ViewIdea", new { Id = item.Id })'" class="btn btn-success">IDEA #@item.Id <br /><span style="font-size: 25px" class="glyphicon glyphicon-circle-arrow-right"></span></button>
                     </td>
                     <td>
-                        <strong>@Html.DisplayFor(modelItem => item.Title)</strong>
+                        @Html.DisplayFor(modelItem => item.Title)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Status)
@@ -131,37 +164,6 @@
                         </button>
                     </td>
                     <td>
-                        <style>
-                            .like, .unlike {
-                                border: 1px solid black;
-                                /*background-color: white;*/
-                                color: black;
-                                /*padding: 14px 28px;*/
-                                /*font-size: 16px;*/
-                                cursor: pointer;
-                            }
-                            /* Blue */
-                            .like {
-                                background-color: white;
-                                border-color: #2196F3;
-                                color: dodgerblue
-                            }
-
-                                .like:hover {
-                                    background: #2196F3;
-                                    color: white;
-                                }
-                            .unlike {
-                                background-color: #2196F3;
-                                border-color: #2196F3;
-                                color: white
-                            }
-
-                                /*.unlike:hover {
-                                    background: #2196F3;
-                                    color: white;
-                                }*/
-                        </style>
                         @{int userId = Convert.ToInt32(Session["UserID"]);}
                         @if (item.Likes.Where(x => x.User_id == userId).Any())
                         {                    
