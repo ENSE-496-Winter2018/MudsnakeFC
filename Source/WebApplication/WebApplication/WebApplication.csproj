@@ -282,7 +282,8 @@
     <Content Include="Views\User\Notifications.cshtml" />
     <Content Include="Views\User\GetNotificationCount.cshtml" />
     <Content Include="Views\User\SuccessStories.cshtml" />
-    <Content Include="Views\User\Dashboard.cshtml" />
+    <Content Include="Views\User\ApproverDashboard.cshtml" />
+    <Content Include="Views\User\GeneralDashboard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
