@@ -104,9 +104,73 @@ namespace WebApplication.Controllers
 
 
 
-        public ActionResult Dashboard()
+        public ActionResult ApproverDashboard()
         {
-            return View();
+            using (var context = new ENSE496Entities())
+            {
+                int teamId = Convert.ToInt32(Session["TeamID"]);
+                List<DataPoint> dataPoints = new List<DataPoint>();
+                List<DataPoint> ideasPerTeam = new List<DataPoint>();
+                var approvedIdeas = context.Ideas.Where(x => x.Status == "Approved").ToList();
+                foreach(Team team in context.Teams)
+                {
+                    int num = 0 + approvedIdeas.Where(x => x.User.Team.Id == team.Id).Count();
+                    dataPoints.Add(new DataPoint(team.Name.ToString(), num));
+                    ideasPerTeam.Add(new DataPoint(team.Name.ToString(), context.Ideas.Where(x => x.User.Team.Id == team.Id).Count()));
+                }
+                List<DataPoint> teamStatusList = new List<DataPoint>();
+                teamStatusList.Add(new DataPoint("Pending", context.Ideas.Where(x => x.User.Team.Id == teamId && x.Status == "Pending").Count()));
+                teamStatusList.Add(new DataPoint("Parked", context.Ideas.Where(x => x.User.Team.Id == teamId && x.Status == "Parked").Count()));
+                teamStatusList.Add(new DataPoint("Approved", context.Ideas.Where(x => x.User.Team.Id == teamId && x.Status == "Approved").Count()));
+                teamStatusList.Add(new DataPoint("Declined", context.Ideas.Where(x => x.User.Team.Id == teamId && x.Status == "Declined").Count()));
+
+                List<DataPoint> teamContributionList = new List<DataPoint>();
+                var myTeam = context.Users.Where(x => x.Team_id == teamId).ToList();
+
+                foreach (User user in myTeam)
+                {
+                    teamContributionList.Add(new DataPoint(user.Username.ToString(), context.Ideas.Where(x => x.User_id == user.Id).Count()));
+                }
+
+                ViewBag.DataPoints1 = JsonConvert.SerializeObject(dataPoints);
+                ViewBag.DataPoints2 = JsonConvert.SerializeObject(ideasPerTeam);
+                ViewBag.DataPoints3 = JsonConvert.SerializeObject(teamStatusList);
+                ViewBag.DataPoints4 = JsonConvert.SerializeObject(teamContributionList);
+                return View();
+            }
+        }
+
+        public ActionResult GeneralDashboard()
+        {
+            using (var context = new ENSE496Entities())
+            {
+                int userId = Convert.ToInt32(Session["UserID"]);
+                List<DataPoint> statusSummary = new List<DataPoint>();
+                statusSummary.Add(new DataPoint("Pending", context.Ideas.Where(x => x.Status == "Pending" && x.User_id == userId).Count()));
+                statusSummary.Add(new DataPoint("Parked", context.Ideas.Where(x => x.Status == "Parked" && x.User_id == userId).Count()));
+                statusSummary.Add(new DataPoint("Approved", context.Ideas.Where(x => x.Status == "Approved" && x.User_id == userId).Count()));
+                statusSummary.Add(new DataPoint("Declined", context.Ideas.Where(x => x.Status == "Declined" && x.User_id == userId).Count()));
+
+
+                List<DataPoint> myMostLikedIdeas = new List<DataPoint>();
+                var myIdeas = context.Ideas.Where(x => x.User_id == userId).ToList().OrderByDescending(x => x.Likes.Count).Take(5);
+                foreach(Idea idea in myIdeas)
+                {
+                    myMostLikedIdeas.Add(new DataPoint("IDEA# " + idea.Id.ToString(), idea.Likes.Count()));
+                }
+
+                List<DataPoint> mostLikedIdeas = new List<DataPoint>();
+                var topIdeas = context.Ideas.ToList().OrderByDescending(x => x.Likes.Count).Take(10);
+                foreach (Idea idea in topIdeas)
+                {
+                    mostLikedIdeas.Add(new DataPoint("IDEA# " + idea.Id.ToString(), idea.Likes.Count()));
+                }
+
+                ViewBag.DataPoints1 = JsonConvert.SerializeObject(statusSummary);
+                ViewBag.DataPoints2 = JsonConvert.SerializeObject(myMostLikedIdeas);
+                ViewBag.DataPoints3 = JsonConvert.SerializeObject(mostLikedIdeas);
+                return View();
+            }
         }
 
         [HttpGet]
@@ -901,8 +965,6 @@ namespace WebApplication.Controllers
                 return RedirectToAction("Notifications");
             }
         }
-
-
 
     }
 }
