@@ -1,0 +1,41 @@
+Title Page
+- Added "Created By" and "Currently Maintained By" fields
+- Added "Last Updated" Field in place of "Date" field
+
+Section 4.1 (Login)
+- Added password recovery link option to functional requirements
+- Edited login requirements to specify that username and password are required rather than email and password as previously stated.
+
+Section 4.2 (Logout)
+- Edited logout functionality. Documentation previously stated that user would have to click on user profile button and then use drop down menu to select "logout". Instead of doing this, users can just click the logout button located directly on the navbar.
+
+Section 4.4 (Search For Ideas)
+- Added "dedicated search results page" specification to functional requirements
+- Changed documentation to specify that search results will be generated dynamically
+
+Section 4.5 (Sorting and Filtering Ideas)
+- Documented sorting functionality and discussed how it can be achieved by clicking on column headings for each idea table
+- Also changed the filtering documentation. Advised that users shoudl use the search bar to create their desired filter. For example, if a user wants to view only pending ideas they should type "Pending" into the search bar
+
+Section 4.6 (View Notification Center)
+- Added that users can specify how frequently they get email notifications about eIDEAS
+- Changed documentation to specify that clicking on the notifications link on navbar will take them to a designated notifications page. This previously stated that user would be able to view notifications without leaving the page they are currently on.
+- Added instructions on how users can dismiss old notifications
+
+Section 4.9 (Subscrive and View Subscribed Ideas)
+- Changed the word "like" to "button" for clarity
+
+Section 4.13 (View Ideas Feed)
+- Created this section along with additional functional requirements for the section
+
+Section 4.14 (View "My Ideas")
+- Created this section along with additional functional requirements for the section
+
+Section 4.14 (View "My Ideas")
+- Created this section along with additional functional requirements for the sectio
+
+Section 4.15 (Post Success Stories)
+- Created this section along with additional functional requirements for the section
+
+
+
